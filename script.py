@@ -1,10 +1,21 @@
 import imaplib
 import email,os
+from db import identifyThread,message_col
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv()
 
 EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 IMAP_SERVER = "imap.gmail.com"
 MAILBOX = "INBOX"
+mailboxes = [
+    "INBOX",
+    '"[Gmail]/Sent Mail"',
+    '"[Gmail]/Spam"'
+]
+
 # ---------------------------------------
 
 def extract_body(msg):
@@ -30,36 +41,60 @@ def extract_body(msg):
 
 
 def fetch_emails(limit=10):
-    imap = imaplib.IMAP4_SSL(IMAP_SERVER)
-    imap.login(EMAIL, PASSWORD)
-    imap.select(MAILBOX)
-
-    status, data = imap.search(None, "ALL")
-    print(status)
-    mail_ids = data[0].split()
-
     emails = []
-    cnt = limit
+    for boxes in mailboxes:
+        imap = imaplib.IMAP4_SSL(IMAP_SERVER)
+        imap.login(EMAIL, PASSWORD)
+        imap.select(boxes)
 
-    for mail_id in reversed(mail_ids):
-        if cnt <= 0:
-            break
+        status, data = imap.search(None, "ALL")
+        print(status)
+        mail_ids = data[0].split()
 
-        _, msg_data = imap.fetch(mail_id, "(RFC822)")
-        raw = msg_data[0][1]
-        msg = email.message_from_bytes(raw)
+        cnt = limit
 
-        emails.append({
-            "message_id": msg.get("Message-ID"),
-            "in_reply_to": msg.get("In-Reply-To"),
-            "references": msg.get("References"),
-            "subject": msg.get("Subject"),
-            "from": msg.get("From"),
-            "date": msg.get("Date"),
-            "body": extract_body(msg)
-        })
+        for mail_id in reversed(mail_ids):
+            if cnt <= 0:
+                break
 
-        cnt -= 1
+            _, msg_data = imap.fetch(mail_id, "(RFC822)")
+            raw = msg_data[0][1]
+            msg = email.message_from_bytes(raw)
 
-    imap.logout()
+            print(msg.get("In-Reply-To"))
+            emails.append({
+                "Message-ID": msg.get("Message-ID"),
+                "In-Reply-To": msg.get("In-Reply-To"),
+                "References": msg.get("References"),
+                "Subject": msg.get("Subject"),
+                "From": msg.get("From"),
+                "Date": msg.get("Date"),
+                "body": extract_body(msg)
+            })
+
+            cnt -= 1
+
+        imap.logout()
+    
     return emails
+
+
+        
+emails = fetch_emails(limit=3)
+
+for mail in emails:
+    thread_id, ticket_id = identifyThread(email=mail)
+    message_doc = {
+        "thread_id": thread_id,
+        "ticket_id": ticket_id,
+        "message_id": mail.get("Message-ID"),
+        "in_reply_to": mail.get("In-Reply-To"),
+        "subject": mail.get("Subject"),
+        "from": mail.get("From"),
+        "date": mail.get("Date"),
+        "headers": None,
+        "raw_body": None,
+        "text_body": mail.get("body"),
+        "created_at": datetime.utcnow()
+    }
+    message_col.insert_one(message_doc)

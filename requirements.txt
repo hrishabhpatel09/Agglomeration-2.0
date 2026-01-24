@@ -1,2 +1,7 @@
 flask
 python-dotenv
+flask-cors
+pymongo
+python-dotenv
+sentence-transformers
+qdrant-client
