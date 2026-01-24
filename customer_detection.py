@@ -1,17 +1,7 @@
 import re
 from typing import Dict
 
-def parse_signature_with_phone(signature: str) -> Dict:
-    """
-    Assumes signature format:
-    Line 1: Regards / Thanks
-    Line 2: Name
-    Line 3: Role / Designation
-    Line 4: Company Name
-    Line 5: Phone number (optional)
-    """
-
-    # Normalize and remove empty lines
+def parse_signature(signature: str):
     lines = [line.strip() for line in signature.splitlines() if line.strip()]
 
     if len(lines) < 4:
@@ -28,10 +18,12 @@ def parse_signature_with_phone(signature: str) -> Dict:
 
     phone = None
     if len(lines) >= 5:
-        phone_candidate = lines[4]
-        # Simple phone regex (international + local)
-        if re.search(r"\+?\d[\d\s\-]{7,}", phone_candidate):
-            phone = phone_candidate
+        phone_line = lines[4]
+
+        # Extract only the phone number
+        phone_match = re.search(r"\+?\d[\d\s\-]{7,}", phone_line)
+        if phone_match:
+            phone = phone_match.group()
 
     return {
         "name": name,
@@ -48,4 +40,4 @@ Tata Steel Ltd
 Phone: +91-9877777777
 """
 
-print(parse_signature_with_phone(signature))
+print(parse_signature(signature))
