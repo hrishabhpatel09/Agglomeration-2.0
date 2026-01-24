@@ -4,3 +4,10 @@ langgraph>=0.0.40
 google-genai>=0.3.0
 python-dotenv
 openai>=1.0.0
+flask
+python-dotenv
+flask-cors
+pymongo
+python-dotenv
+sentence-transformers
+qdrant-client
