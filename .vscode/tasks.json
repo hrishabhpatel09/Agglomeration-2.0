@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "install_openai",
+			"type": "shell",
+			"command": "pip install",
+			"args": [
+				"openai"
+			],
+			"isBackground": false,
+			"group": "install"
+		}
+	]
+}
