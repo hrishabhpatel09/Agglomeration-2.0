@@ -5,7 +5,7 @@ from config import MONGO_URI
 client = MongoClient(MONGO_URI)
 db = client.email_system
 
-threads_col = db.threads
+threads_col = db.tickets
 messages_col = db.messages
 counters_col = db.counters
 

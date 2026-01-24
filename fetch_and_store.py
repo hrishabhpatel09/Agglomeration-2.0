@@ -4,4 +4,4 @@ from email_fetcher import fetch_emails
 
 if __name__ == "__main__":
     init_qdrant()
-    fetch_emails(limit=6)
+    fetch_emails(limit=8)

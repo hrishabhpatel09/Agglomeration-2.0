@@ -1,10 +1,10 @@
 import imaplib, email
 from email.policy import default
 from vector_db import add_vector, get_gemini_embeddings
-from thread_identifier import identify_thread
+from ticket_identifier import identify_ticket
 from db import messages_col
 from config import EMAIL, PASSWORD, IMAP_SERVER
-import uuid,time
+import uuid
 
 
 def extract_body(msg):
@@ -68,7 +68,7 @@ def fetch_emails(limit=3):
                 # ---------------------------------------------------------
                 # Your existing Logic (Thread detection & DB)
                 # ---------------------------------------------------------
-                thread_id, ticket_id = identify_thread(email_obj)
+                thread_id, ticket_id = identify_ticket(email_obj)
 
                 print(f"Saving in DB: {email_obj.get("message_id")}")
                 messages_col.replace_one(

@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
-from sentence_transformers import SentenceTransformer
+from google import genai
+from google.genai import types
+import os
 
 load_dotenv()
 
@@ -14,20 +16,28 @@ VECTOR_SIZE = 768  # MiniLM output size
 
 # ---------------- INIT ----------------
 client = QdrantClient(url=QDRANT_URL)
+client2 = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
 
-import google.generativeai as genai
-import os
 
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 def get_gemini_embeddings(texts):
-    result = genai.embed_content(
-        model="models/text-embedding-004",
-        content=texts,
-        task_type="retrieval_document",
-        title="Optional Title" 
+    # Call the API
+    response = client2.models.embed_content(
+        model="text-embedding-004",
+        contents=texts,
+        config=types.EmbedContentConfig(
+            task_type="RETRIEVAL_DOCUMENT",
+            title="Optional Title"
+        )
     )
-    return result['embedding']
+
+    # Return the embedding vector
+    # logic: if input is a single string, return the first embedding values
+    if isinstance(texts, str):
+        return response.embeddings[0].values
+    
+    # If input is a list of strings, return a list of vectors
+    return [e.values for e in response.embeddings]
 
 def init_qdrant():
     collections = [c.name for c in client.get_collections().collections]

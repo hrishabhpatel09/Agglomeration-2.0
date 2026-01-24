@@ -6,7 +6,7 @@ from vector_db import get_gemini_embeddings, search_similar
 from config import TICKET_REGEX
 
 
-def identify_thread(email):
+def identify_ticket(email):
     subject = email.get("subject") or ""
     body = email.get("text_body")
     message_id = email.get("message_id")
