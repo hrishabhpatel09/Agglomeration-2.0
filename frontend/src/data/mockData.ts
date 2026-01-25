@@ -8,7 +8,7 @@
 
 export type Severity = 'P1' | 'P2' | 'P3' | 'P4';
 export type Tier = 'Gold' | 'Silver' | 'Standard';
-export type Category = 'Billing' | 'Tech' | 'Shipping' | 'Account';
+// export type Category = 'Billing' | 'Tech' | 'Shipping' | 'Account';
 export type TicketStatus = 'Open' | 'Pending' | 'Resolved';
 export type SLAStatus = 'Safe' | 'Warning' | 'Breached';
 
@@ -19,7 +19,8 @@ export interface Ticket {
   customerEmail: string;
   tier: string;
   text_body: string;
-  category: Category;
+  ai_response: string;
+  category: string;
   date: string;
   severity: string;
   reasoning: string;
@@ -47,10 +48,12 @@ export interface EmailMessage {
   from: string;
   to: string;
   subject: string;
+  category: string;
   text_data: string;
   timestamp: string;
   isIncoming: boolean;
   sla_hours?: string | number;
+  ai_response?: string;
   severity?: string;
 }
 

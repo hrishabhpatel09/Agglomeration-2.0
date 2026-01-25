@@ -6,7 +6,9 @@ from db import messages_col,companies_col
 from config import EMAIL, PASSWORD, IMAP_SERVER
 from severity_and_urgency import analyse
 import uuid
-import re
+import requests
+import re,os
+from gemini_classification_fallback import classify_email_gemini
 
 
 
@@ -80,7 +82,7 @@ def fetch_emails(limit=3):
                     "tier": tier
                 }
 
-
+                # Sla Time
                 response = analyse(email_obj)
 
                 print(type(response))
@@ -94,6 +96,38 @@ def fetch_emails(limit=3):
                 # ---------------------------------------------------------
                 thread_id, ticket_id = identify_ticket(email_obj)
 
+                test_payload = requests.get(f"http://localhost:8000/tickets/{ticket_id}/messages")
+                # test_payload["name"] = msg.get("From")
+
+                API_URL = "https://602fc9ebe19b.ngrok-free.app/resolve_query"
+                prevdata = test_payload.json()
+                prevdata["messages"].append(email_obj)
+
+                print(type(prevdata))
+                print(prevdata)
+                # TODO: Append 60% similarity search:
+
+
+                response = requests.post(API_URL, json=prevdata)
+
+                response = response.json()
+                
+                # if(response.is_redirected):
+                #     # todo: Update status to redirected to personal agent
+                #     pass
+
+                # API_URL2 = "https://602fc9ebe19b.ngrok-free.app/classify_email"
+                # classify_response = requests.post(API_URL2, json=email_obj["text_body"]).json()
+                email_obj["ai_response"] = response["response"]
+                
+                classify_response = classify_email_gemini(email_text=email_obj["text_body"],api_key=os.getenv("OPENROUTER_API_KEY"))
+
+                print("\n")
+                print("Ye asli hai")
+                print(classify_response)
+
+                if classify_response["confidence"] >0.8:
+                    email_obj["category"] = classify_response["category"]
                 print(f"Saving in DB: {email_obj.get("message_id")}")
                 messages_col.replace_one(
                     {"message_id": email_obj.get("message_id")},

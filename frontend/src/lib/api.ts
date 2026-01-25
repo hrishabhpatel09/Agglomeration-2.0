@@ -18,6 +18,8 @@ export interface ApiTicket {
   body_html?: string;
   sla_hours: number;
   severity: string;
+  ai_response: string;
+  category: string;
 }
 
 export interface TicketsResponse {

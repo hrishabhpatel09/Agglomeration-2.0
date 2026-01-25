@@ -129,7 +129,7 @@ export const TicketDetailPanel = ({ ticket, onClose }: TicketDetailPanelProps) =
                 <TabsContent value="response" className="mt-0">
                   <ResponsePreview
                     incomingEmail={ticket}
-                    suggestedReply={suggestedReply}
+                    suggestedReply={ticket}
                   />
                 </TabsContent>
               </div>
