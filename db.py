@@ -8,6 +8,7 @@ db = client.email_system
 threads_col = db.tickets
 messages_col = db.messages
 counters_col = db.counters
+companies_col = db.companies
 
 threads_col.create_index("ticket_id", unique=True)
 messages_col.create_index(

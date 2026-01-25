@@ -2,9 +2,12 @@ import imaplib, email
 from email.policy import default
 from vector_db import add_vector, get_gemini_embeddings
 from ticket_identifier import identify_ticket
-from db import messages_col
+from db import messages_col,companies_col
 from config import EMAIL, PASSWORD, IMAP_SERVER
+from severity_and_urgency import analyse
 import uuid
+import re
+
 
 
 def extract_body(msg):
@@ -14,6 +17,12 @@ def extract_body(msg):
                 return part.get_payload(decode=True).decode(errors="ignore")
     return msg.get_payload(decode=True).decode(errors="ignore")
 
+def extract_domain(from_field):
+    if not from_field:
+        return None
+    
+    match = re.search(r'@([\w.-]+\.\w+)', from_field)
+    return match.group(1).lower() if match else None
 
 def fetch_emails(limit=3):
     # NOTE: Check your provider's specific folder names
@@ -51,7 +60,14 @@ def fetch_emails(limit=3):
                 msg = email.message_from_bytes(msg_data[0][1], policy=default)
 
                 message_id = msg.get("Message-ID") or str(uuid.uuid4())
+                print(extract_domain(msg.get("From")))
+                tier = companies_col.find_one({"domain": extract_domain(msg.get("From"))})
+                if tier==None:
+                    tier="Free"
+                else:
+                    tier = tier["tier"]
 
+                print(companies_col.find_one({"domain": extract_domain(msg.get("From"))}))
                 email_obj = {
                     "message_id": message_id,
                     "subject": msg.get("Subject"),
@@ -60,8 +76,16 @@ def fetch_emails(limit=3):
                     "in_reply_to": msg.get("In-Reply-To"),
                     "references": msg.get("References"),
                     "text_body": extract_body(msg),
-                    "folder": folder 
+                    "folder": folder,
+                    "tier": tier
                 }
+
+
+                response = analyse(email_obj)
+
+                print(type(response))
+                for key,val in response.items():
+                    email_obj[key] = val
 
                 # print(f"Processing: {email_obj['subject']}")
 

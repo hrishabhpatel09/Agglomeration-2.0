@@ -162,7 +162,6 @@ def getBodyWithoutSignature(body: str):
 
     # Remove signature from body
     body_without_signature = body[: body.rfind(signature)]
-    print(body_without_signature.strip())
     return body_without_signature.strip()
 
 
@@ -194,13 +193,5 @@ def analyse(msg):
         "sender_role": msg["from"]
     })
 
-    print(json.dumps(result, indent=2))
-
-msg = {
-  "subject": "Report export taking longer than usual",
-  "text_body": "Hi Team,\r\n\r\nWe are noticing that the report export feature is taking longer than usual\r\n(around 2–3 minutes instead of a few seconds).\r\n\r\nThis is not blocking our work, as users can still access the reports\r\nthrough the dashboard. However, it would be good to check if this can\r\nbe optimized.\r\n\r\nThanks,\r\nAnkit Sharma\r\nSoftware Engineer\r\nTata Steel Ltd\r\n",
-  "tier": "Gold",
-  "from": "pandapriyampritam@gmail.com"
-}
-
-analyse(msg)
+    print(result)
+    return result
