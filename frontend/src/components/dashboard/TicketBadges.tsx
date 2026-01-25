@@ -52,7 +52,7 @@ export const TierBadge = ({ tier }: TierBadgeProps) => {
   const config = {
     Gold: { className: 'badge-tier-gold', icon: '★' },
     Silver: { className: 'badge-tier-silver', icon: '✦' },
-    Standard: { className: 'badge-tier-standard', icon: '○' },
+    Free: { className: 'badge-tier-standard', icon: '○' },
   };
 
   const { className, icon } = config[tier];

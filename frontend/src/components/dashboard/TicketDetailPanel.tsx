@@ -14,6 +14,7 @@ import {
   getDefaultThreadData,
   getDefaultCustomerProfile,
   getDefaultSuggestedReply,
+  EmailMessage,
 } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,7 +27,7 @@ import { CustomerInsights } from './CustomerInsights';
 import { ResponsePreview } from './ResponsePreview';
 
 interface TicketDetailPanelProps {
-  ticket: Ticket | null;
+  ticket: EmailMessage | null;
   onClose: () => void;
 }
 
@@ -38,7 +39,7 @@ export const TicketDetailPanel = ({ ticket, onClose }: TicketDetailPanelProps) =
   const threadData: ThreadData = mockThreadData[ticket.id] || getDefaultThreadData(ticket.id);
   const customerProfile: CustomerProfile = mockCustomerProfiles[ticket.id] || getDefaultCustomerProfile(ticket);
   const suggestedReply: SuggestedReply = mockSuggestedReplies[ticket.id] || getDefaultSuggestedReply(ticket);
-  const incomingEmail = threadData.emails.find(e => e.isIncoming);
+  const incomingEmail = ticket.text_data || "No email content available.";
 
   return (
     <AnimatePresence>
@@ -72,7 +73,7 @@ export const TicketDetailPanel = ({ ticket, onClose }: TicketDetailPanelProps) =
           {/* SLA Status */}
           <div className="px-4 py-3 border-b border-border">
             <SLAIndicator
-              timeRemaining={ticket.slaTimeRemaining}
+              timeRemaining={ticket.sla_hours}
               status={ticket.slaStatus}
               variant="full"
             />
@@ -127,7 +128,7 @@ export const TicketDetailPanel = ({ ticket, onClose }: TicketDetailPanelProps) =
 
                 <TabsContent value="response" className="mt-0">
                   <ResponsePreview
-                    incomingEmail={incomingEmail}
+                    incomingEmail={ticket}
                     suggestedReply={suggestedReply}
                   />
                 </TabsContent>

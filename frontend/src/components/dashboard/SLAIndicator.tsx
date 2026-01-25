@@ -9,6 +9,7 @@ interface SLAIndicatorProps {
 }
 
 export const SLAIndicator = ({ timeRemaining, status, variant = 'default' }: SLAIndicatorProps) => {
+  console.log(timeRemaining)
   const formatTime = (minutes: number): string => {
     if (minutes < 0) return 'BREACHED';
     if (minutes < 60) return `${minutes}m left`;
@@ -54,7 +55,7 @@ export const SLAIndicator = ({ timeRemaining, status, variant = 'default' }: SLA
     return (
       <div className={cn('inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium', styles.container)}>
         <Icon className="h-3 w-3" />
-        <span>{formatTime(timeRemaining)}</span>
+        <span>{`${timeRemaining} h`}</span>
       </div>
     );
   }
@@ -68,7 +69,7 @@ export const SLAIndicator = ({ timeRemaining, status, variant = 'default' }: SLA
             <span className="text-sm font-medium">SLA Status</span>
           </div>
           <span className={cn('text-sm font-semibold', styles.text)}>
-            {formatTime(timeRemaining)}
+            {`${timeRemaining} h`}
           </span>
         </div>
         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
@@ -84,7 +85,7 @@ export const SLAIndicator = ({ timeRemaining, status, variant = 'default' }: SLA
   return (
     <div className={cn('inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium', styles.container)}>
       <Icon className="h-3.5 w-3.5" />
-      <span>{formatTime(timeRemaining)}</span>
+      <span>{`${timeRemaining} h`}</span>
       <div className="h-1.5 w-12 bg-muted/50 rounded-full overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-all', styles.progressColor)}

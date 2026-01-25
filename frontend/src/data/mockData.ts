@@ -17,11 +17,14 @@ export interface Ticket {
   subject: string;
   customerName: string;
   customerEmail: string;
-  tier: Tier;
+  tier: string;
+  text_body: string;
   category: Category;
-  severity: Severity;
+  date: string;
+  severity: string;
+  reasoning: string;
   status: TicketStatus;
-  slaTimeRemaining: number; // in minutes, negative means breached
+  sla_hours: string | number; // in minutes, negative means breached
   slaStatus: SLAStatus;
   dedupStatus?: string;
   masterTicketId?: string;
@@ -44,9 +47,11 @@ export interface EmailMessage {
   from: string;
   to: string;
   subject: string;
-  body: string;
+  text_data: string;
   timestamp: string;
   isIncoming: boolean;
+  sla_hours?: string | number;
+  severity?: string;
 }
 
 export interface ThreadData {
@@ -82,10 +87,10 @@ export interface SuggestedReply {
 }
 
 // Sample tickets data
-export const mockTickets: Ticket[] = [
+export const mockTickets = [
   {
     id: 'TKT-2847',
-    subject: 'Unable to process refund for order #89234',
+    subject: 'Panda is Good',
     customerName: 'Sarah Mitchell',
     customerEmail: 'sarah.mitchell@techcorp.com',
     tier: 'Gold',

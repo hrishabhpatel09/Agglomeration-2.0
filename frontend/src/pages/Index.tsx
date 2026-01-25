@@ -9,14 +9,17 @@ import { SLAMonitorView } from '@/components/dashboard/SLAMonitorView';
 import { InsightsView } from '@/components/dashboard/InsightsView';
 import { MasterTicketsView } from '@/components/dashboard/MasterTicketsView';
 import { SettingsView } from '@/components/dashboard/SettingsView';
-import { mockTickets, Ticket } from '@/data/mockData';
+import { Ticket } from '@/data/mockData';
+import { useTickets } from '@/hooks/useTickets';
+
+
 const defaultFilters: FilterState = {
   category: 'all',
   severity: 'all',
   tier: 'all',
   status: 'all',
   slaStatus: 'all',
-  sortBy: 'sla',
+  sortBy: 'newest',
 };
 
 const Index = () => {
@@ -26,6 +29,9 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+
+  // Fetch tickets from API
+  const { tickets: allTickets, loading, error } = useTickets();
 
   // Calculate active filters count
   const activeFiltersCount = useMemo(() => {
@@ -40,7 +46,7 @@ const Index = () => {
 
   // Filter and sort tickets
   const filteredTickets = useMemo(() => {
-    let result = [...mockTickets];
+    let result = [...allTickets];
 
     // Search filter
     if (searchQuery) {
@@ -100,7 +106,7 @@ const Index = () => {
     }
 
     return result;
-  }, [mockTickets, searchQuery, filters]);
+  }, [allTickets, searchQuery, filters]);
 
   const handleClearFilters = () => {
     setFilters(defaultFilters);
@@ -166,21 +172,23 @@ const Index = () => {
                 {/* Stats bar */}
                 <div className="px-4 py-3 border-t border-border bg-muted/30 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    Showing <span className="font-medium text-foreground">{filteredTickets.length}</span> of{' '}
-                    <span className="font-medium text-foreground">{mockTickets.length}</span> tickets
+                    {loading ? 'Loading...' : error ? `Error: ${error}` : (
+                      <>Showing <span className="font-medium text-foreground">{filteredTickets.length}</span> of{' '}
+                      <span className="font-medium text-foreground">{allTickets.length}</span> tickets</>
+                    )}
                   </span>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <span className="h-2 w-2 rounded-full bg-destructive" />
-                      {mockTickets.filter((t) => t.slaStatus === 'Breached').length} Breached
+                      {allTickets.filter((t) => t.slaStatus === 'Breached').length} Breached
                     </span>
                     <span className="flex items-center gap-1">
                       <span className="h-2 w-2 rounded-full bg-warning" />
-                      {mockTickets.filter((t) => t.slaStatus === 'Warning').length} Warning
+                      {allTickets.filter((t) => t.slaStatus === 'Warning').length} Warning
                     </span>
                     <span className="flex items-center gap-1">
                       <span className="h-2 w-2 rounded-full bg-success" />
-                      {mockTickets.filter((t) => t.slaStatus === 'Safe').length} Safe
+                      {allTickets.filter((t) => t.slaStatus === 'Safe').length} Safe
                     </span>
                   </div>
                 </div>

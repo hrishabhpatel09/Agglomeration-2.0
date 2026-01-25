@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { GitMerge, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Ticket } from '@/data/mockData';
+import { EmailMessage, Ticket } from '@/data/mockData';
 import { SLAIndicator } from './SLAIndicator';
 import { SeverityBadge, TierBadge, CategoryBadge, StatusBadge } from './TicketBadges';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TicketTableProps {
-  tickets: Ticket[];
+  tickets: EmailMessage[];
   selectedTicketId: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   isLoading?: boolean;
@@ -62,7 +62,7 @@ export const TicketTable = ({ tickets, selectedTicketId, onSelectTicket, isLoadi
       <AnimatePresence mode="popLayout">
         {tickets.map((ticket, index) => (
           <motion.div
-            key={ticket.id}
+            key={ticket.from + ticket.subject + index}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98 }}
@@ -119,7 +119,7 @@ export const TicketTable = ({ tickets, selectedTicketId, onSelectTicket, isLoadi
             {/* SLA */}
             <div className="lg:col-span-2 flex items-center">
               <SLAIndicator 
-                timeRemaining={ticket.slaTimeRemaining} 
+                timeRemaining={Number(ticket.sla_hours)} 
                 status={ticket.slaStatus}
                 variant="compact"
               />

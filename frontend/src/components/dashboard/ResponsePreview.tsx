@@ -12,6 +12,7 @@ interface ResponsePreviewProps {
 }
 
 export const ResponsePreview = ({ incomingEmail, suggestedReply }: ResponsePreviewProps) => {
+  console.log('Incoming Email:', incomingEmail);
   const handleCopy = () => {
     navigator.clipboard.writeText(suggestedReply.body);
     toast.success('Reply copied to clipboard');
@@ -50,7 +51,7 @@ export const ResponsePreview = ({ incomingEmail, suggestedReply }: ResponsePrevi
                   <div>
                     <p className="text-xs text-muted-foreground mb-2">Body</p>
                     <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-                      {incomingEmail.body}
+                      {incomingEmail.text_body || 'No email content available.'}
                     </p>
                   </div>
                 </>
